@@ -1,9 +1,13 @@
 package alipay
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/ooncn/common/obj"
 	"github.com/ooncn/common/util"
+	"github.com/ooncn/opay/t"
+	"regexp"
 )
 
 //工具类API > 用户登陆授权
@@ -373,3 +377,34 @@ func (r *Request) TradeFastpayRefundQuery(trade_no, out_request_no, org_pid stri
 	return
 } //统一收单交易退款查询 商户可使用该接口查询自已通过trade.refund或trade.refund.apply提交的退款请求是否执行成功。 该接口的返回码10000，仅代表本次查询操作成功，不代表退款成功。如果该接口返回了查询数据，且refund_status为空或为REFUND_SUCCESS，则代表退款成功，如果没有查询到则代表未退款成功，可以调用退款接口进行重试。重试时请务必保证退款请求号一致。
 //统一收单交易结算接口
+
+func AlipayVerifyMap(m map[string]string, PublicKey string) error {
+	sign, is := m["sign"]
+	if !is {
+		return errors.New("sign 不存在")
+	}
+	delete(m, "sign")
+	str := obj.MapAndStr(m)
+	return AlipayVerify(str, sign, PublicKey)
+}
+func AlipayVerifySyn(str, PublicKey string) (string, error) {
+	reg := regexp.MustCompile(`{"alipay_.*_response":{(.*)},"sign":".*`)
+	m := reg.ReplaceAllString(str, `{$1}`)
+	//v := reg.FindAllStringSubmatch(str,-1)
+	//fmt.Println(v[0][1])
+	reg = regexp.MustCompile(`.*"sign":"([^"]*)".*`)
+	sign := reg.ReplaceAllString(str, `$1`)
+	//v = reg.FindAllStringSubmatch(str,-1)
+	//fmt.Println(v[0][1])
+	return m, AlipayVerify(m, sign, PublicKey)
+}
+func AlipayVerify(m, sign, PublicKey string) error {
+	signBytes, err := base64.StdEncoding.DecodeString(sign)
+	if err != nil {
+		return err
+	}
+	err = t.RsaVerySignWithSha256([]byte(m), signBytes, []byte(fmt.Sprintf(`-----BEGIN RSA PUBLIC KEY-----
+%s
+-----END RSA PUBLIC KEY-----`, PublicKey)))
+	return err
+}

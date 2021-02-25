@@ -70,6 +70,16 @@ func (a *AopClient) NewRsa2() (err error) {
 	}
 	return
 }
+func (a *AopClient) NewRsa2Resp() (err error) {
+	r, err := util.NewRsa2PKCS1(a.RsaPublicKey, a.RsaPrivateKey)
+	if err != nil {
+		fmt.Println("支付宝加密组件失败" + err.Error())
+		return err
+	} else {
+		a.Rsa2 = r
+	}
+	return
+}
 
 /**
 
@@ -179,8 +189,11 @@ func (r *Request) SignGet() (sign string) {
 	sign, _ = r.Client.Rsa2.Sign(str)
 	return
 }
+
 func (r *Request) CheckSign() bool {
-	m := r.Map
+	return r.CheckSignObj(r.Map)
+} // 验签
+func (r *Request) CheckSignObj(m obj.Map) bool {
 	sign, is := m["sign"]
 	if !is {
 		fmt.Println("sign 不存在")
@@ -189,11 +202,10 @@ func (r *Request) CheckSign() bool {
 	delete(m, "sign_type")
 	delete(m, "sign")
 	str := obj.MapAndStr(m)
-	fmt.Println(str)
 	err := r.Client.Rsa2.Verify(str, sign)
 	fmt.Println(err)
 	return err == nil
-}
+} // 验签
 
 /*
 其他 APP 或 外部 H5 跳转小程序目前有两种方式可以跳转：
