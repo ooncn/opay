@@ -10,7 +10,6 @@ import (
 )
 
 type AopClient struct {
-
 	//应用ID
 	AppId string `json:"app_id"`
 

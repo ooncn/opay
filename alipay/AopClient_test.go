@@ -122,6 +122,7 @@ func TestAlipayTradePagePay(t *testing.T) {
 	fmt.Println(code)
 	var c = ApiTradePagePayNew(code, "硬盘盒子", "", 0.01)
 	AliReqPC.SetBizContentJson(c)
+	AliReqPC.SetMethod(c.GetMethod())
 	h := AliReqPC.HTTPPOST(c.GetMethod())
 	fmt.Print(h.Url + "?")
 	fmt.Println(h.Params)
