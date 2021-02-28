@@ -2,7 +2,7 @@ module github.com/ooncn/opay
 
 go 1.15
 
-replace github.com/ooncn/common => ..\common
+replace github.com/ooncn/common => ../common
 
 require (
 	github.com/kataras/iris/v12 v12.1.8

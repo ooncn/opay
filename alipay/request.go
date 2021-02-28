@@ -2337,7 +2337,6 @@ type ApiTradePagePay struct {
 	OutTradeNo  string  `json:"out_trade_no"` //必选	64 	商户订单号
 	Subject     string  `json:"subject"`      //必选 	256 	订单标题
 	TotalAmount float64 `json:"total_amount"` //必选 	9 	订单总金额，单位为元，精确到小数点后两位，取值范围[0.01,100000000] 	9.00
-	QuitURL     string  `json:"quit_url"`     //必选 	400 	用户付款中途退出返回商户网站的地址 	http://www.taobao.com/product/113714.html
 
 	TimeExpire         string         `json:"time_expire"`         //可选	32 	绝对超时时间，格式为yyyy-MM-dd HH:mm:ss 	2016-12-31 10:05:01
 	AuthToken          string         `json:"auth_token"`          //可选 	40 	针对用户授权接口，获取用户相关数据时，用于标识用户授权关系 	appopenBb64d181d0146481ab6a762c00714cC27
@@ -2406,13 +2405,12 @@ type ApiTradePagePay struct {
 func (ApiTradePagePay) GetMethod() string {
 	return "alipay.trade.page.pay"
 }
-func ApiTradePagePayNew(OutTradeNo, Subject, QuitURL string, TotalAmount float64) ApiTradePagePay {
+func ApiTradePagePayNew(OutTradeNo, Subject string, TotalAmount float64) ApiTradePagePay {
 	return ApiTradePagePay{
 		ProductCode: "FAST_INSTANT_TRADE_PAY",
 		OutTradeNo:  OutTradeNo,
 		Subject:     Subject,
 		TotalAmount: TotalAmount,
-		QuitURL:     QuitURL,
 		TimeExpire:  util.TimeUtil.DateToyMdHmsSepTo(time.Now().Add(30 * time.Minute)), // 默认 30分钟付款时间 格式为yyyy-MM-dd HH:mm:ss 	2016-12-31 10:05:01
 		GoodsType:   "1",
 	}

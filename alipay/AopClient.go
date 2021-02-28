@@ -138,9 +138,12 @@ func (r *Request) SetMethod(method string) {
 	r.Set("method", method)
 }
 func (r *Request) SetReturnUrl(return_url string) {
+	//r.Set("return_url", url.QueryEscape(return_url))
 	r.Set("return_url", return_url)
 }
 func (r *Request) SetNotifyUrl(notify_url string) {
+
+	//r.Set("notify_url", url.QueryEscape(notify_url))
 	r.Set("notify_url", notify_url)
 }
 func (r *Request) SetTimestamp(timestamp string) {
@@ -153,9 +156,6 @@ func (r *Request) SetBizContentJson(biz_content interface{}) {
 	str := util.JsonToStr(biz_content)
 	str, _ = util.JsonClear(str)
 	r.Set("biz_content", str)
-}
-func (r *Request) SetSign() {
-
 }
 func (r *Request) ToUri() string {
 	m := r.Map
